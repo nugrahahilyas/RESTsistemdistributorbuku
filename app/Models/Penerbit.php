@@ -23,7 +23,7 @@ class Penerbit extends Model
         {
             return $this->findAll();
         }
-        return $this->find($id);
+        return $this->where(['id' => $id])->first();
     }
 
 }

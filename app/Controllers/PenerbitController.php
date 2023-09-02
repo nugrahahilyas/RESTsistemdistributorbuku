@@ -2,13 +2,18 @@
 
 namespace App\Controllers;
 
+use App\Models\Penerbit;
 use CodeIgniter\RESTful\ResourceController;
 
 class PenerbitController extends ResourceController
 {
-    protected $modelName = 'App\Models\Penerbit';
+    protected $penerbit = 'App\Models\Penerbit';
     protected $format = 'json';
 
+    public function __construct()
+    {
+        $this->penerbit = new Penerbit();
+    }
     /**
      * Return an array of resource objects, themselves in array format
      *
@@ -18,7 +23,7 @@ class PenerbitController extends ResourceController
     {
         $data = [
             'message' => 'success',
-            'data_penerbit' => $this->model->orderBy('id', 'DESC')->findAll()
+            'data_penerbit' => $this->penerbit->orderBy('id', 'DESC')->findAll()
         ];
         return $this->respond($data, 200);
     }
@@ -43,7 +48,7 @@ class PenerbitController extends ResourceController
             return $this->failValidationErrors($response);
         }
 
-        $this->model->insert([
+        $this->penerbit->insert([
             'id_penerbit'   => esc($this->request->getVar('id_penerbit')),
             'nama_penerbit' => esc($this->request->getVar('nama_penerbit')),
             'alamat'        => esc($this->request->getVar('alamat')),
@@ -62,7 +67,7 @@ class PenerbitController extends ResourceController
      */
     public function update($id = null)
     {
-        $id_penerbit = $this->model->find($id);
+        $id_penerbit = $this->penerbit->find($id);
         if($id_penerbit['id_penerbit'] != esc($this->request->getVar('id_penerbit'))) {
             $rule_id_penerbit = 'required|is_unique[penerbit.id_penerbit]';
         } else {
@@ -81,7 +86,7 @@ class PenerbitController extends ResourceController
             return $this->failValidationErrors($response);
         }
 
-        $this->model->update($id, [
+        $this->penerbit->update($id, [
             'id_penerbit'   => esc($this->request->getVar('id_penerbit')),
             'nama_penerbit' => esc($this->request->getVar('nama_penerbit')),
             'alamat'        => esc($this->request->getVar('alamat')),
@@ -100,10 +105,18 @@ class PenerbitController extends ResourceController
      */
     public function delete($id = null)
     {
-        $this->model->delete($id);
+        $penerbit = $this->penerbit->getPenerbit($id);
+        // if ($id == $penerbit['id']) {
+        //     $this->penerbit->delete($id);
+        //     $response = [
+        //         'message' => 'data berhasil dihapus'
+        //     ];
+        //     return $this->respondDeleted($response);
+        // }
         $response = [
-            'message' => 'data berhasil dihapus'
+            // 'message' => 'data tidak ditemukan'
+            'message' => 'data tidak ditemukan'
         ];
-        return $this->respondDeleted($response);
+        return $this->fail($response);
     }
 }
